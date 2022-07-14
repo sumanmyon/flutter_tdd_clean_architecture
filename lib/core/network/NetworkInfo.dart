@@ -11,10 +11,10 @@ class NetworkInfoImpl implements NetworkInfo {
 
   @override
   Future<bool>? get isConnected async {
-    // var result = await connectionChecker.hasConnection;
-    // if(result == null){
-    //   return false;
-    // }
-    return true;
+    var result = await connectionChecker.hasConnection;
+    if(result == null){
+      return false;
+    }
+    return result;
   }
 }

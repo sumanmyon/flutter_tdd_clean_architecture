@@ -1,13 +1,10 @@
 import 'package:flutter_tdd_clean_architecture/core/network/NetworkInfo.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
-import 'package:mockito/mockito.dart';
+import 'package:mocktail/mocktail.dart';
 
 class MockInternetConnectionChecker extends Mock
-    implements InternetConnectionChecker {
-  // @override
-  // Future<bool> get hasConnection => Future.value(true);
-}
+    implements InternetConnectionChecker {}
 
 void main() {
   NetworkInfoImpl? networkInfo;
@@ -20,16 +17,35 @@ void main() {
 
   group('isConnected', () {
     test(
-      'should forward the call to DataConnectionChecker.hasConnection',
+      'should forward the call to DataConnectionChecker.hasConnection is true',
       () async {
         // arrange
-        final tHasConnectionFuture = Future.value(true);
-        when(mockDataConnectionChecker?.hasConnection).thenAnswer((_) => tHasConnectionFuture);
+        final tHasConnectionFuture = true;
+        when(() => mockDataConnectionChecker?.hasConnection)
+            .thenAnswer((_) async => tHasConnectionFuture);
         // act
         // NOTICE: We're NOT awaiting the result
-        final result = networkInfo?.isConnected!;
+        final result = await networkInfo?.isConnected!;
         // assert
-        verify(mockDataConnectionChecker?.hasConnection);
+        verify(() => mockDataConnectionChecker?.hasConnection);
+        // Utilizing Dart's default referential equality.
+        // Only references to the same object are equal.
+        expect(result, tHasConnectionFuture);
+      },
+    );
+
+    test(
+      'should forward the call to DataConnectionChecker.hasConnection is false',
+      () async {
+        // arrange
+        final tHasConnectionFuture = false;
+        when(() => mockDataConnectionChecker?.hasConnection)
+            .thenAnswer((_) async => tHasConnectionFuture);
+        // act
+        // NOTICE: We're NOT awaiting the result
+        final result = await networkInfo?.isConnected!;
+        // assert
+        verify(() => mockDataConnectionChecker?.hasConnection);
         // Utilizing Dart's default referential equality.
         // Only references to the same object are equal.
         expect(result, tHasConnectionFuture);
@@ -37,16 +53,3 @@ void main() {
     );
   });
 }
-
-// group("isConnected", () {
-//   test(
-//     "should forward call to InternetConnectionChecker.hasConnection",
-//     () async {
-//       when(mockInternetConnectionChecker?.hasConnection)
-//           .thenAnswer((realInvocation) async => true);
-//       final result = await networkInfoImpl?.isConnected;
-//       verify(mockInternetConnectionChecker?.hasConnection);
-//       expect(result, true);
-//     },
-//   );
-// });
